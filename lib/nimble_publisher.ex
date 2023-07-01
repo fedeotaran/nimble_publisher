@@ -26,9 +26,17 @@ defmodule NimblePublisher do
 
   @doc false
   def __extract__(module, opts) do
-    builder = Keyword.fetch!(opts, :build)
     from = Keyword.fetch!(opts, :from)
     as = Keyword.fetch!(opts, :as)
+
+    {entries, paths} = get_entries(opts)
+    Module.put_attribute(module, as, entries)
+    {from, paths}
+  end
+
+  def get_entries(opts) do
+    from = Keyword.fetch!(opts, :from)
+    builder = Keyword.fetch!(opts, :build)
     parser_module = Keyword.get(opts, :parser)
 
     for highlighter <- Keyword.get(opts, :highlighters, []) do
@@ -43,8 +51,7 @@ defmodule NimblePublisher do
         build_entry(builder, path, parsed_contents, opts)
       end)
 
-    Module.put_attribute(module, as, entries)
-    {from, paths}
+    {entries, paths}
   end
 
   @doc """
